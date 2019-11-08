@@ -15,7 +15,6 @@ library(tm)
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")
 
-
 # Define UI for application that draws a histogram
 ui <- fluidPage(
   headerPanel("Bob Ross - painting by the numbers"),
@@ -27,7 +26,7 @@ ui <- fluidPage(
   ),
   
   fluidRow(
-    column(4, wellPanel(
+    column(2, wellPanel(
       selectInput("sky", "Sky:",
                    c("clouds", "sunset", "mountains")),
       selectInput("ground", "Ground:",
@@ -36,6 +35,7 @@ ui <- fluidPage(
       checkboxInput("tree", "Tree", value = FALSE),
       actionButton("button", "Generate title!")
     )),
+    column(3,
     
            imageOutput("image1", height = "3px", width = "3px")
     ,
@@ -43,12 +43,12 @@ ui <- fluidPage(
            imageOutput("image2", height = "3px", width = "3px")
     ,
           imageOutput("image3", height = "3px", width = "3px"),
-    
-    column(4, hidden(
+    ),
+    column(2, offset=4,
       div(id='text_div',
           verbatimTextOutput("text")
       )
-    ))
+    )
   )
 
 ), tabPanel("some other stuff i'm gonna do",
@@ -58,7 +58,6 @@ ui <- fluidPage(
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   observeEvent(input$button, {
-    toggle('text_div')
     output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
   })
    
