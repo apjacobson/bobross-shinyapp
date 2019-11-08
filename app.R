@@ -11,13 +11,17 @@ library(shiny)
 library(png)
 library(shinyWidgets)
 library(shinyjs)
+library(tm)
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")
 
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-  titlePanel("Bob Ross Painting Creater"),
+  headerPanel("Bob Ross - painting by the numbers"),
+  tabsetPanel(
+    tabPanel("Painting Creator",
+  titlePanel("Create your own Bob Ross painting"),
   setBackgroundImage(
     src = "www/bob.png"
   ),
@@ -47,8 +51,9 @@ ui <- fluidPage(
     ))
   )
 
-)
-
+), tabPanel("some other stuff i'm gonna do",
+  titlePanel("Oh baby")
+)))
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
