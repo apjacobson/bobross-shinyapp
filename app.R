@@ -1,21 +1,16 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(png)
 library(shinyWidgets)
 library(shinyjs)
 library(tm)
+library(arules)
+library(arulesViz)
+library(stringr)
+
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(
   headerPanel("Bob Ross - painting by the numbers"),
   tabsetPanel(
@@ -32,7 +27,7 @@ ui <- fluidPage(
       selectInput("ground", "Ground:",
                    c("grass", "ocean", "river", "lake")),
       selectInput("frame", "Frame:",
-                   c("rectangle", "circle", "oval", "seashell", "window", "wood")),
+                   c("rectangular", "circle", "oval", "seashell", "window", "wood")),
 
       checkboxInput("tree", "Tree", value = FALSE),
       checkboxInput("flowers", "Flowers", value = FALSE),
@@ -54,9 +49,16 @@ ui <- fluidPage(
           imageOutput("image6", height = "3px", width = "3px")
     ),
     column(2, offset=4,
-      div(id='text_div',
+      h1("WWBRD"),
+      h6("(What Would Bob Ross Do?)"),
+      h4("Bob Ross would call this..."),
+      p(id='text_div',
           verbatimTextOutput("text")
-      )
+      ),
+      h4("Bob Ross would probably add..."),
+      p(id='text_div',
+        verbatimTextOutput("text2")
+      ),
     )
   )
 
@@ -64,12 +66,33 @@ ui <- fluidPage(
   titlePanel("Oh baby")
 )))
 
-# Define server logic required to draw a histogram
+# Define server logic required to draw the image
 server <- function(input, output) {
+  output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
   observeEvent(input$button, {
     output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
   })
-   
+  output$text2 <- renderText({
+    inputs <- c(str_to_upper(input$sky),str_to_upper(input$ground))
+    if (input$tree == TRUE) {
+      inputs <- c(inputs,"TREE")
+    }
+    if (input$flowers == TRUE) {
+      inputs <- c(inputs,"FLOWERS")
+    }
+    if (input$moon == TRUE) {
+      inputs <- c(inputs, "MOON")
+    }
+    if (!is.null(input$frame)) {
+      if (input$frame == "wood") {
+        inputs <- c(inputs, "WOOD_FRAMED")
+      } else {
+        new <- paste(str_to_upper(input$frame), "_FRAME",sep="")
+        inputs <- c(inputs, new)
+      }
+    }
+    return(paste(run_apriori(inputs),collapse="\n"))
+  })
   output$image1 <- renderImage({
     if (is.null(input$ground))
       return(NULL)
@@ -209,7 +232,7 @@ server <- function(input, output) {
     if (is.null(input$frame))
       return(NULL)
     
-    if (input$frame == "rectangle") {
+    if (input$frame == "rectangular") {
       return(list(
         src = "www/none.png",
         contentType = "image/png",
