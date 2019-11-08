@@ -31,8 +31,13 @@ ui <- fluidPage(
                    c("clouds", "sunset", "mountains")),
       selectInput("ground", "Ground:",
                    c("grass", "ocean", "river", "lake")),
+      selectInput("frame", "Frame:",
+                   c("rectangle", "circle", "oval", "seashell", "window", "wood")),
 
       checkboxInput("tree", "Tree", value = FALSE),
+      checkboxInput("flowers", "Flowers", value = FALSE),
+      checkboxInput("moon", "Moon", value = FALSE),
+      checkboxInput("bob", "Bob Ross", value = FALSE),
       actionButton("button", "Generate title!")
     )),
     column(3,
@@ -43,6 +48,10 @@ ui <- fluidPage(
            imageOutput("image2", height = "3px", width = "3px")
     ,
           imageOutput("image3", height = "3px", width = "3px"),
+          imageOutput("image4", height = "3px", width = "3px"),
+          imageOutput("image5", height = "3px", width = "3px"),
+          imageOutput("image7", height = "3px", width = "3px"),
+          imageOutput("image6", height = "3px", width = "3px")
     ),
     column(2, offset=4,
       div(id='text_div',
@@ -137,6 +146,110 @@ server <- function(input, output) {
         alt = "none"
       ))
     }  }, deleteFile = FALSE)
+  
+  output$image4 <- renderImage({
+    if (is.null(input$flowers))
+      return(NULL)
+    
+    if (input$flowers == TRUE) {
+      return(list(
+        src = "www/flowers.png",
+        contentType = "image/png",
+        alt = "flowers"
+      ))
+    } else {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    }  }, deleteFile = FALSE)
+  
+  
+  output$image5 <- renderImage({
+    if (is.null(input$moon))
+      return(NULL)
+    
+    if (input$moon == TRUE) {
+      return(list(
+        src = "www/moon.png",
+        contentType = "image/png",
+        alt = "moon"
+      ))
+    } else {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    }  }, deleteFile = FALSE)
+  
+  
+  output$image6 <- renderImage({
+    if (is.null(input$bob))
+      return(NULL)
+    
+    if (input$bob == TRUE) {
+      return(list(
+        src = "www/bob.png",
+        contentType = "image/png",
+        alt = "bob"
+      ))
+    } else {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    }  }, deleteFile = FALSE)
+  
+  
+  
+  output$image7 <- renderImage({
+    if (is.null(input$frame))
+      return(NULL)
+    
+    if (input$frame == "rectangle") {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    } else if (input$frame == "circle") {
+      return(list(
+        src = "www/circle_frame.png",
+        filetype = "image/png",
+        alt = "circle frame"
+      ))
+    } else if (input$frame == "oval") {
+      return(list(
+        src = "www/oval_frame.png",
+        filetype = "image/png",
+        alt = "oval frame"
+      ))
+    } else if (input$frame == "seashell") {
+      return(list(
+        src = "www/seashell_frame.png",
+        filetype = "image/png",
+        alt = "seashell frame"
+      ))
+    } else if (input$frame == "window") {
+      return(list(
+        src = "www/window_frame.png",
+        filetype = "image/png",
+        alt = "window frame"
+      ))
+    } else if (input$frame == "wood") {
+      return(list(
+        src = "www/wood_frame.png",
+        filetype = "image/png",
+        alt = "wood frame"
+      ))
+    }
+    
+  }, deleteFile = FALSE)
+  
+  
 }
 
 # Run the application 
