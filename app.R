@@ -23,13 +23,13 @@ ui <- fluidPage(
   fluidRow(
     column(2, wellPanel(
       selectInput("sky", "Sky:",
-                   c("clouds", "sunset", "mountains")),
+                   c("clouds", "sunset", "mountains", "snow")),
       selectInput("ground", "Ground:",
                    c("grass", "ocean", "river", "lake")),
       selectInput("frame", "Frame:",
                    c("rectangular", "circle", "oval", "seashell", "window", "wood")),
 
-      checkboxInput("tree", "Tree", value = FALSE),
+      sliderInput("tree", "Number of trees", 0, 10, 0),
       checkboxInput("flowers", "Flowers", value = FALSE),
       checkboxInput("moon", "Moon", value = FALSE),
       checkboxInput("bob", "Bob Ross", value = FALSE),
@@ -147,6 +147,12 @@ server <- function(input, output) {
         filetype = "image/png",
         alt = "mountains"
       ))
+    } else if (input$sky == "snow") {
+      return(list(
+        src = "www/snow.png",
+        filetype = "image/png",
+        alt = "snow"
+      ))
     }
     
   }, deleteFile = FALSE)
@@ -156,17 +162,18 @@ server <- function(input, output) {
     if (is.null(input$tree))
       return(NULL)
     
-    if (input$tree == TRUE) {
-      return(list(
-        src = "www/tree.png",
-        contentType = "image/png",
-        alt = "tree"
-      ))
-    } else {
+    if (input$tree == 0) {
       return(list(
         src = "www/none.png",
         contentType = "image/png",
         alt = "none"
+      ))
+    } else {
+      f <- paste("www/tree", input$tree, ".png", sep = '')
+      return(list(
+        src = f,
+        contentType = "image/png",
+        alt = "tree"
       ))
     }  }, deleteFile = FALSE)
   
