@@ -55,7 +55,7 @@ ui <- fluidPage(
       p(id='text_div',
           verbatimTextOutput("text")
       ),
-      h4("Bob Ross would probably add..."),
+      h4("Bob Ross would add..."),
       p(id='text_div',
         verbatimTextOutput("text2")
       ),

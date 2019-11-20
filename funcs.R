@@ -34,3 +34,4 @@ run_apriori(c("SUN","LAKE"))
 rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.5), appearance=list(default="rhs",lhs=c("CLOUDS")), control=list(verbose=F))
 rules_conf <- sort(rules, by="confidence", decreasing=TRUE)
 x <- DATAFRAME(rules_conf)$RHS
+
