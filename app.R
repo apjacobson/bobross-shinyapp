@@ -6,12 +6,18 @@ library(tm)
 library(arules)
 library(arulesViz)
 library(stringr)
+library(ggplot2)
+library(shinythemes)
 
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")
+df <- read.csv("by_season.csv")
+seasons <- reshape2::melt(df, id.var='SEASON')
+var_opt = unique(seasons$variable)
 
 # Define UI for application
 ui <- fluidPage(
+  theme = shinytheme("flatly"),
   headerPanel("Bob Ross - painting by the numbers"),
   tabsetPanel(
     tabPanel("Painting Creator",
@@ -64,12 +70,27 @@ ui <- fluidPage(
     )
   )
 
-), tabPanel("some other stuff i'm gonna do",
-  titlePanel("Oh baby")
+),tabPanel("Paintings Through the Years",
+           titlePanel("Across seasons, how often have different elements appeared in paintings?"),
+           sidebarLayout(
+             sidebarPanel(
+               width = 2,
+               checkboxGroupInput("var", "Element:",
+                                  choices=var_opt,
+                                  selected="CLOUDS")),
+             mainPanel(plotOutput("plot"))
+           )
 )))
 
 # Define server logic required to draw the image
 server <- function(input, output) {
+  output$plot <- renderPlot({
+    dat <- subset(seasons, seasons$variable %in% input$var)
+    ggplot(data=dat, aes(x=SEASON,y=value)) + geom_line(aes(color=variable),size=1.2) +
+      labs(title="Painting Feature Popularity Over Time", x="Season",y="Number of Uses",color="Features") +
+      scale_fill_brewer(palette = "Set1") +
+      theme_bw()
+  })
   output$text <- renderText({paste(title_word(input$sky))})
   observeEvent(input$button, {
     output$text <- renderText({paste(title_word(input$sky))})
@@ -80,11 +101,23 @@ server <- function(input, output) {
       sky <- "SUN"
     }
     inputs <- c(str_to_upper(sky),str_to_upper(input$ground))
-    if (input$sky == "mountains") {
-      inputs <- c(inputs,"TREES","SNOWY_MOUNTAIN","MOUNTAIN","CLOUDS","CONIFER")
+    if (input$ground == "river") {
+      inputs <- c(inputs, "GRASS")
     }
-    if (input$tree == TRUE) {
-      inputs <- c(inputs,"TREE")
+    if (input$sky == "mountains" | input$sky == "snow") {
+      inputs <- c(inputs,"SNOWY_MOUNTAIN","MOUNTAIN","CLOUDS","WINTER")
+      if (input$tree == 0) {
+        inputs <- c(inputs,"TREES")
+      }
+    }
+    if (input$sky == "mountains") {
+      inputs <- c(inputs, "SNOW")
+    }
+    if (input$sky == "snow") {
+      inputs <- c(inputs, "MOUNTAINS")
+    }
+    if (input$tree > 0) {
+      inputs <- c(inputs,"TREES")
     }
     if (input$flowers == TRUE) {
       inputs <- c(inputs,"FLOWERS")

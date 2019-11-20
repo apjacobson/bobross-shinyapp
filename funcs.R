@@ -43,7 +43,3 @@ run_apriori <- function(word) {
   }
   answers
 }
-
-bob <- read.csv("bob-ross.csv")[c(3:69)]
-bob2 <-apply(bob,2,as.logical)
-rules <- apriori(data=bob2,parameter=list(minlen=2), appearance=list(default="rhs",lhs="TREES"), control=list(verbose=F))
