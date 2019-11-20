@@ -31,6 +31,7 @@ ui <- fluidPage(
 
       sliderInput("tree", "Number of trees", 0, 10, 0),
       checkboxInput("flowers", "Flowers", value = FALSE),
+      checkboxInput("bushes", "Bushes", value = FALSE),
       checkboxInput("moon", "Moon", value = FALSE),
       checkboxInput("bob", "Bob Ross", value = FALSE),
       actionButton("button", "Generate title!")
@@ -45,6 +46,7 @@ ui <- fluidPage(
           imageOutput("image5", height = "3px", width = "3px"),
           imageOutput("image3", height = "3px", width = "3px"),
           imageOutput("image4", height = "3px", width = "3px"),
+          imageOutput("image8", height = "3px", width = "3px"),
           imageOutput("image7", height = "3px", width = "3px"),
           imageOutput("image6", height = "3px", width = "3px")
     ),
@@ -193,6 +195,24 @@ server <- function(input, output) {
         src = "www/flowers.png",
         contentType = "image/png",
         alt = "flowers"
+      ))
+    } else {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    }  }, deleteFile = FALSE)
+  
+  output$image8 <- renderImage({
+    if (is.null(input$bushes))
+      return(NULL)
+    
+    if (input$bushes == TRUE) {
+      return(list(
+        src = "www/bushes.png",
+        contentType = "image/png",
+        alt = "bushes"
       ))
     } else {
       return(list(
