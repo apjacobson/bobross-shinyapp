@@ -8,6 +8,8 @@ library(arulesViz)
 library(stringr)
 library(ggplot2)
 library(shinythemes)
+library(NLP)
+library(openNLP)
 
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")

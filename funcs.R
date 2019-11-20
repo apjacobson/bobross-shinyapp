@@ -9,7 +9,6 @@ title_word <- function(w){
   vec <- removeWords(gsub("\"", "", paste(bob[bob[[w]] == 1,]$TITLE, collapse = ' ')), stopWords)
   vec <- gsub("---", " ", gsub(" & ", "", trimws(gsub("  ", " ", gsub("   ", " ", vec)))))
   words <- strsplit(vec, " ")[[1]]
-  #sample(words, 1)
   acqTag <- tagPOS(tolower(words))
   words_tagged <- strsplit(acqTag$POStagged, " ")[[1]]
   
@@ -25,6 +24,18 @@ title_word <- function(w){
   }
   
   toupper(paste(str_sub(sample(adjs, 1), 1, -4), str_sub(sample(nouns, 1), 1, -4)))
+}
+
+tagPOS <-  function(x, ...) {
+  s <- as.String(x)
+  word_token_annotator <- Maxent_Word_Token_Annotator()
+  a2 <- Annotation(1L, "sentence", 1L, nchar(s))
+  a2 <- NLP::annotate(s, word_token_annotator, a2)
+  a3 <- NLP::annotate(s, Maxent_POS_Tag_Annotator(), a2)
+  a3w <- a3[a3$type == "word"]
+  POStags <- unlist(lapply(a3w$features, `[[`, "POS"))
+  POStagged <- paste(sprintf("%s/%s", s[a3w], POStags), collapse = " ")
+  list(POStagged = POStagged, POStags = POStags)
 }
 
 run_apriori <- function(word) {
