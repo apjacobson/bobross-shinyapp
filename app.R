@@ -73,7 +73,14 @@ server <- function(input, output) {
     output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
   })
   output$text2 <- renderText({
-    inputs <- c(str_to_upper(input$sky),str_to_upper(input$ground))
+    sky <- input$sky
+    if (input$sky == "sunset") {
+      sky <- "SUN"
+    }
+    inputs <- c(str_to_upper(sky),str_to_upper(input$ground))
+    if (input$sky == "mountains") {
+      inputs <- c(inputs,"TREES","SNOWY_MOUNTAIN","MOUNTAIN","CLOUDS","CONIFER")
+    }
     if (input$tree == TRUE) {
       inputs <- c(inputs,"TREE")
     }

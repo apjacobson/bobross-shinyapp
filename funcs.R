@@ -16,7 +16,7 @@ run_apriori <- function(word) {
   bob <- read.csv("bob-ross.csv")[c(3:69)]
   bob2 <-apply(bob,2,as.logical)
   bob3 <- as(bob2, "transactions")
-  rules <- apriori(data=bob3,parameter=list(minlen=2), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
+  rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.5), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
   rules_conf <- sort(rules, by="confidence", decreasing=TRUE) 
   x <- DATAFRAME(rules_conf)$RHS
   y <- unique(x)
@@ -29,6 +29,8 @@ run_apriori <- function(word) {
   answers
 }
 
-bob <- read.csv("bob-ross.csv")[c(3:69)]
-bob2 <-apply(bob,2,as.logical)
-rules <- apriori(data=bob2,parameter=list(minlen=2), appearance=list(default="rhs",lhs="TREES"), control=list(verbose=F))
+run_apriori(c("SUN","LAKE"))
+
+rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.5), appearance=list(default="rhs",lhs=c("CLOUDS")), control=list(verbose=F))
+rules_conf <- sort(rules, by="confidence", decreasing=TRUE)
+x <- DATAFRAME(rules_conf)$RHS
