@@ -1,4 +1,4 @@
-title_word <- function(w, nwords = 1){
+title_word <- function(w){
   if (w == "sunset"){w <- "sun"}
   bob <- read.csv("bob-ross.csv")
   w <- toupper(w)
@@ -9,14 +9,29 @@ title_word <- function(w, nwords = 1){
   vec <- removeWords(gsub("\"", "", paste(bob[bob[[w]] == 1,]$TITLE, collapse = ' ')), stopWords)
   vec <- gsub("---", " ", gsub(" & ", "", trimws(gsub("  ", " ", gsub("   ", " ", vec)))))
   words <- strsplit(vec, " ")[[1]]
-  sample(words, nwords)
+  #sample(words, 1)
+  acqTag <- tagPOS(tolower(words))
+  words_tagged <- strsplit(acqTag$POStagged, " ")[[1]]
+  
+  nouns <- c()
+  adjs <- c()
+  for (word in words_tagged) {
+    if (str_sub(word, -3, -1) == "/NN") {
+      nouns <- c(nouns, word)
+    }
+    if (str_sub(word, -3, -1) == "/JJ") {
+      adjs <- c(adjs, word)
+    } 
+  }
+  
+  toupper(paste(str_sub(sample(adjs, 1), 1, -4), str_sub(sample(nouns, 1), 1, -4)))
 }
 
 run_apriori <- function(word) {
   bob <- read.csv("bob-ross.csv")[c(3:69)]
   bob2 <-apply(bob,2,as.logical)
   bob3 <- as(bob2, "transactions")
-  rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.5), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
+  rules <- apriori(data=bob3,parameter=list(minlen=2), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
   rules_conf <- sort(rules, by="confidence", decreasing=TRUE) 
   x <- DATAFRAME(rules_conf)$RHS
   y <- unique(x)
@@ -29,9 +44,6 @@ run_apriori <- function(word) {
   answers
 }
 
-run_apriori(c("SUN","LAKE"))
-
-rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.5), appearance=list(default="rhs",lhs=c("CLOUDS")), control=list(verbose=F))
-rules_conf <- sort(rules, by="confidence", decreasing=TRUE)
-x <- DATAFRAME(rules_conf)$RHS
-
+bob <- read.csv("bob-ross.csv")[c(3:69)]
+bob2 <-apply(bob,2,as.logical)
+rules <- apriori(data=bob2,parameter=list(minlen=2), appearance=list(default="rhs",lhs="TREES"), control=list(verbose=F))

@@ -42,9 +42,9 @@ ui <- fluidPage(
     
            imageOutput("image2", height = "3px", width = "3px")
     ,
+          imageOutput("image5", height = "3px", width = "3px"),
           imageOutput("image3", height = "3px", width = "3px"),
           imageOutput("image4", height = "3px", width = "3px"),
-          imageOutput("image5", height = "3px", width = "3px"),
           imageOutput("image7", height = "3px", width = "3px"),
           imageOutput("image6", height = "3px", width = "3px")
     ),
@@ -68,9 +68,9 @@ ui <- fluidPage(
 
 # Define server logic required to draw the image
 server <- function(input, output) {
-  output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
+  output$text <- renderText({paste(title_word(input$sky))})
   observeEvent(input$button, {
-    output$text <- renderText({paste(title_word(input$sky), title_word(input$ground))})
+    output$text <- renderText({paste(title_word(input$sky))})
   })
   output$text2 <- renderText({
     sky <- input$sky
