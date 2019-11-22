@@ -39,18 +39,51 @@ tagPOS <-  function(x, ...) {
 }
 
 run_apriori <- function(word) {
-  bob <- read.csv("bob-ross.csv")[c(3:69)]
+  bob <- read.csv("data.csv")[c(3:61)]
   bob2 <-apply(bob,2,as.logical)
   bob3 <- as(bob2, "transactions")
-  rules <- apriori(data=bob3,parameter=list(minlen=2), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
+  rules <- apriori(data=bob3,parameter=list(minlen=2,conf=0.35), appearance=list(default="rhs",lhs=word), control=list(verbose=F))
   rules_conf <- sort(rules, by="confidence", decreasing=TRUE) 
-  x <- DATAFRAME(rules_conf)$RHS
-  y <- unique(x)
-  answers <- rep(NA, length(y))
-  ind =1
-  for (val in y) {
-    answers[ind]=str_remove_all(val, "[{}]")
-    ind = ind +1
+  answers <- rep(" ",1)
+  if (length(rules_conf)>0) {
+    x <- DATAFRAME(rules_conf)$RHS
+    y <- unique(x)
+    answers <- rep(NA, length(y))
+    ind =1
+    for (val in y) {
+      answers[ind]=str_remove_all(val, "[{}]")
+      ind = ind +1
+    }
   }
   answers
+}
+
+surprise <- function() {
+  bob <- read.csv("data.csv")[c(1:2)]
+  ind <- sample(1:nrow(bob), 1)
+  ans<- paste(bob[ind,1], ": \"", str_remove_all(bob[ind,2], "\""),"\"",sep="")
+  ans
+}
+
+my_knn <- function(v1,v2){
+  col1 <- read.csv("col1.csv")
+  newdf <- col1[3:18]
+  my_l <- colnames((newdf))
+  newrow = rep(0,16)
+  sel <- c(v1,v2)
+  for (x in sel){
+    i <- which(x == my_l)[[1]]
+    newrow[i] = 1
+  }
+  new <- knn(newdf, newrow, seq(1,nrow(col1)), k = 1)
+  ans <- paste(col1[new,1], ": \"", str_remove_all(col1[new,2], "\""),"\"",sep="")
+  ans
+}
+
+special <- function(v1){
+  col2 <- read.csv("col2.csv")
+  newdf <- col2[ which(col2[v1] >0), ]
+  ind <- sample(as.numeric(rownames(newdf)), 1)
+  ans<- paste(col2[ind,1], ": \"", str_remove_all(col2[ind,2], "\""),"\"",sep="")
+  ans
 }

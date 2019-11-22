@@ -9,21 +9,27 @@ library(stringr)
 library(ggplot2)
 library(shinythemes)
 library(NLP)
+library(class)
 library(openNLP)
 
 dat <- read.csv("./bob-ross.csv")
 source("funcs.R")
 df <- read.csv("by_season.csv")
+col1 <- read.csv("col1.csv")[3:18]
+col2 <- read.csv("col2.csv")[3:8]
 seasons <- reshape2::melt(df, id.var='SEASON')
 var_opt = unique(seasons$variable)
+var_opt_2 = colnames(col1)[1:8]
+var_opt_3 = colnames(col1)[9:16]
+var_opt_4 = colnames(col2)
 
 # Define UI for application
 ui <- fluidPage(
   theme = shinytheme("flatly"),
-  headerPanel("Bob Ross - painting by the numbers"),
+  headerPanel("Painting by the Numbers: Bob Ross"),
   tabsetPanel(
     tabPanel("Painting Creator",
-  titlePanel("Create your own Bob Ross painting"),
+  fluidRow(column(12,h3("Create your own Bob Ross painting"))),
   setBackgroundImage(
     src = "www/bob.png"
   ),
@@ -68,12 +74,12 @@ ui <- fluidPage(
       h4("Bob Ross would add..."),
       p(id='text_div',
         verbatimTextOutput("text2")
-      ),
+      )
     )
   )
 
 ),tabPanel("Paintings Through the Years",
-           titlePanel("Across seasons, how often have different elements appeared in paintings?"),
+           fluidRow(column(12,h3("Across seasons, how often have different elements appeared in paintings?"))),
            sidebarLayout(
              sidebarPanel(
                width = 2,
@@ -81,6 +87,63 @@ ui <- fluidPage(
                                   choices=var_opt,
                                   selected="CLOUDS")),
              mainPanel(plotOutput("plot"))
+           )
+),tabPanel("Episode Recommendations",
+           fluidRow(column(12,h3("What episodes should you watch?"))),
+           fluidRow(
+             column(4,h4("A painting with..."),
+                    span("Choose some elements & we'll pick the closest painting."),
+                    fluidRow(
+                      column(6,checkboxGroupInput("var2", "",
+                                                  choices=var_opt_2)),
+                      column(6,checkboxGroupInput("var3","", choices=var_opt_3))),
+                    actionButton("choose_el", "Generate")
+                    ),
+             column(4,h4("Something special"),
+                    span("These elements only appear in a few episodes! Choose one to get a recommendation."),
+                    radioButtons("var4", "", choices=var_opt_4),
+                    actionButton("choose_special", "Generate")),
+             column(4,
+                    h4("Surprise me!"),
+                    p("Click the button to randomly choose an episode."),
+                    actionButton("random", "Generate"),
+                    br()
+                    )
+           ),
+           fluidRow(
+             column(6,offset=3, 
+                    h3(textOutput("choose_ep"))
+                    )
+           )
+), tabPanel("About this App",
+            fluidRow(column(10, offset=1,br(),
+              h5("This app was created to explore the Tidy Tuesdays Bob Ross dataset from 538. It was created by 
+                Ashley Jacobson and Markelle Kelly.")
+            )),
+           fluidRow(
+             column(4, offset=1,h3("Painting Creator"), p("The painting creator, in addition to
+                    visualizing the painting you design in the style of Bob Ross, predicts the title and
+                                                          other elements Bob Ross would suggest. The title is
+                                                          generated based on paintings with similar backgrounds (i.e,
+                                                          based on the \"sky\" and \"ground\" options). From the set of
+                                                          similar paintings, we pulled out the nouns and adjectives using
+                                                          the openNLP package, and generated a random noun/adjective pair.
+                                                          To predict what elements Bob
+                                                          Ross would add, we used the apriori algorithm to generate
+                                                          association rules. We return elements x with a confidence
+                                                          above 0.35 for (current elements)→(x).")
+           ),
+           column(4, offset=1,h3("Episode Recommendations"), p("The episode recommender offers three different
+                                                               methods of getting suggestions. The first allows
+                                                               users to choose elements they want to see in a painting and
+                                                               performs K-Nearest-Neighbors to get the closest 
+                                                               real painting. In the case of a tie, clicking the
+                                                               button multiple times will return multiple different 
+                                                               episodes. The second column includes several elements 
+                                                               that only appear in a few (less than 10) episodes.
+                                                               Clicking the button returns a random episode with 
+                                                               the chosen element. Finally, the \"Surprise me!\"
+                                                               section will generate a completely random episode."))
            )
 )))
 
@@ -96,6 +159,16 @@ server <- function(input, output) {
   output$text <- renderText({paste(title_word(input$sky))})
   observeEvent(input$button, {
     output$text <- renderText({paste(title_word(input$sky))})
+  })
+  output$choose_ep <- renderText({paste("")})
+  observeEvent(input$random, {
+    output$choose_ep <- renderText({paste(surprise())})
+  })
+  observeEvent(input$choose_el, {
+    output$choose_ep <- renderText({paste(my_knn(isolate(input$var2),isolate(input$var3)))})
+  })
+  observeEvent(input$choose_special, {
+    output$choose_ep <- renderText({paste(special(isolate(input$var4)))})
   })
   output$text2 <- renderText({
     sky <- input$sky
@@ -126,6 +199,9 @@ server <- function(input, output) {
     }
     if (input$moon == TRUE) {
       inputs <- c(inputs, "MOON")
+    }
+    if (input$bushes == TRUE) {
+      inputs <- c(inputs, "BUSHES")
     }
     if (!is.null(input$frame)) {
       if (input$frame == "wood") {
