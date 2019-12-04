@@ -47,6 +47,7 @@ ui <- fluidPage(
       checkboxInput("flowers", "Flowers", value = FALSE),
       checkboxInput("bushes", "Bushes", value = FALSE),
       checkboxInput("moon", "Moon", value = FALSE),
+      checkboxInput("cabin", "Cabin", value = FALSE),
       checkboxInput("bob", "Bob Ross", value = FALSE),
       actionButton("button", "Generate title!")
     )),
@@ -59,6 +60,7 @@ ui <- fluidPage(
     ,
           imageOutput("image5", height = "3px", width = "3px"),
           imageOutput("image3", height = "3px", width = "3px"),
+          imageOutput("image9", height = "3px", width = "3px"),
           imageOutput("image4", height = "3px", width = "3px"),
           imageOutput("image8", height = "3px", width = "3px"),
           imageOutput("image7", height = "3px", width = "3px"),
@@ -371,6 +373,24 @@ server <- function(input, output) {
       ))
     }  }, deleteFile = FALSE)
   
+  
+  output$image9 <- renderImage({
+    if (is.null(input$cabin))
+      return(NULL)
+    
+    if (input$cabin == TRUE) {
+      return(list(
+        src = "www/cabin.png",
+        contentType = "image/png",
+        alt = "cabin"
+      ))
+    } else {
+      return(list(
+        src = "www/none.png",
+        contentType = "image/png",
+        alt = "none"
+      ))
+    }  }, deleteFile = FALSE)
   
   
   output$image7 <- renderImage({
