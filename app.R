@@ -88,7 +88,7 @@ ui <- fluidPage(
                checkboxGroupInput("var", "Element:",
                                   choices=var_opt,
                                   selected="CLOUDS")),
-             mainPanel(plotOutput("plot"))
+             mainPanel(plotOutput("plot"),h5("Note: There were a total of 13 episodes in each season."))
            )
 ),tabPanel("Episode Recommendations",
            fluidRow(column(12,h3("What episodes should you watch?"))),
