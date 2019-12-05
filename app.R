@@ -180,6 +180,9 @@ server <- function(input, output) {
     inputs <- c(str_to_upper(sky),str_to_upper(input$ground))
     if (input$ground == "river") {
       inputs <- c(inputs, "GRASS")
+      if (input$bushes != TRUE) {
+        inputs <- c(inputs, "BUSHES")
+      }
     }
     if (input$sky == "mountains" | input$sky == "snow") {
       inputs <- c(inputs,"SNOWY_MOUNTAIN","MOUNTAIN","CLOUDS","WINTER")
@@ -204,6 +207,9 @@ server <- function(input, output) {
     }
     if (input$bushes == TRUE) {
       inputs <- c(inputs, "BUSHES")
+    }
+    if (input$cabin == TRUE) {
+      inputs <- c(inputs, "CABIN", "STRUCTURE")
     }
     if (!is.null(input$frame)) {
       if (input$frame == "wood") {
